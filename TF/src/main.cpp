@@ -207,6 +207,12 @@ float pos_MC_x = 0;
 float pos_MC_y = 0;
 float pos_MC_z = 0;
 
+float current_time = 0;
+float variation_time = 0;
+float last_time = 0;
+
+float sensivity = 3.0f;
+
 int main(int argc, char* argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -236,7 +242,7 @@ int main(int argc, char* argv[])
     // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(1280, 720, "INF01047 - 00302369 - Vinicius Fraga Coromberque", NULL, NULL);
+    window = glfwCreateWindow(1280, 720, "INF01047 - 00302369, 00268613 - Vinicius Fraga Coromberque, Mateus Nunes Campos", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -326,11 +332,7 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
-    float current_time = 0;
-    float variation_time = 0;
-    float last_time = 0;
-
-    float cameraSpeed = 3.0f;
+    float characterSpeed = 3.0f;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -349,6 +351,7 @@ int main(int argc, char* argv[])
         //
         //           R     G     B     A
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 
         // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
         // e também resetamos todos os pixels do Z-buffer (depth buffer).
@@ -393,24 +396,24 @@ int main(int argc, char* argv[])
         // glm::vec4 v = crossproduct(w,u);
 
         if(move_w){
-            pos_MC_x += -w.x * variation_time * cameraSpeed;
+            pos_MC_x += -w.x * variation_time * characterSpeed;
             //pos_MC_y += -w.y * 0.005f;
-            pos_MC_z += -w.z * variation_time * cameraSpeed;
+            pos_MC_z += -w.z * variation_time * characterSpeed;
         }
         if(move_a){
-            pos_MC_x += -u.x * variation_time * cameraSpeed;
+            pos_MC_x += -u.x * variation_time * characterSpeed;
             //pos_MC_y += -u.y * 0.005f;
-            pos_MC_z += -u.z * variation_time * cameraSpeed;
+            pos_MC_z += -u.z * variation_time * characterSpeed;
         }
         if(move_s){
-            pos_MC_x += +w.x * variation_time * cameraSpeed;
+            pos_MC_x += +w.x * variation_time * characterSpeed;
             //pos_MC_y += +w.y * 0.005f;
-            pos_MC_z += +w.z * variation_time * cameraSpeed;
+            pos_MC_z += +w.z * variation_time * characterSpeed;
         }
         if(move_d){
-            pos_MC_x += +u.x * variation_time * cameraSpeed;
+            pos_MC_x += +u.x * variation_time * characterSpeed;
             //pos_MC_y += +u.y * 0.005f;
-            pos_MC_z += +u.z * variation_time * cameraSpeed;
+            pos_MC_z += +u.z * variation_time * characterSpeed;
         }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
@@ -1154,8 +1157,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da câmera com os deslocamentos
-        g_CameraTheta -= 0.01f*dx;
-        g_CameraPhi   += 0.01f*dy;
+        g_CameraTheta -= variation_time * sensivity * dx;
+        g_CameraPhi   += variation_time * sensivity * dy;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
         float phimax = 3.141592f/2;
@@ -1179,8 +1182,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da câmera com os deslocamentos
-        g_CameraTheta += 0.01f*dx;
-        g_CameraPhi   -= 0.01f*dy;
+        g_CameraTheta += variation_time * sensivity * dx;
+        g_CameraPhi   -= variation_time * sensivity * dy;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
         float phimax = 3.141592f/2;
