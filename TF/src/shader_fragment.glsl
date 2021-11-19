@@ -6,6 +6,7 @@
 // "shader_vertex.glsl" e "main.cpp".
 in vec4 position_world;
 in vec4 normal;
+in vec3 colorGouraud;
 
 // Posição do vértice atual no sistema de coordenadas local do modelo.
 in vec4 position_model;
@@ -36,6 +37,9 @@ uniform sampler2D TextureImage2;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
+out vec3 lambert_diffuse_term;
+out vec3 ambient_term;
+out vec3 phong_specular_term;
 
 // Constantes
 #define M_PI   3.14159265358979323846
@@ -209,7 +213,9 @@ void main()
     float lambert = max(0,dot(n,l));
 
     if ( object_id == PLANE ){
+
         color = Kd2 * (lambert_diffuse_term + ambient_term + phong_specular_term + 0.01);
+
     }else{
 
         color = Kd0 * (lambert_diffuse_term + ambient_term + phong_specular_term + 0.01);
@@ -218,6 +224,12 @@ void main()
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
+    if(object_id == SPHERE){
+
+        color = colorGouraud;
+
+    }else
+
     color = pow(color, vec3(1.0,1.0,1.0)/2.2);
 }
 

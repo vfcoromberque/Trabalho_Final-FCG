@@ -19,6 +19,7 @@ out vec4 position_world;
 out vec4 position_model;
 out vec4 normal;
 out vec2 texcoords;
+out vec3 colorGouraud;
 
 void main()
 {
@@ -60,6 +61,28 @@ void main()
     // Veja slides 123-151 do documento Aula_07_Transformacoes_Geometricas_3D.pdf.
     normal = inverse(transpose(model)) * normal_coefficients;
     normal.w = 0.0;
+
+    vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 camera_position = inverse(view) * origin;
+
+    vec4 l = normalize(vec4(1.0,1.0,0.5,0.0));
+    vec4 n = normalize(normal);
+
+    vec4 p = position_world;
+    vec4 v = normalize(camera_position - p);
+
+    vec4 h = normalize(v + l);
+
+    vec3 Kd = vec3(1.0,1.0,1.0);
+    vec3 Ks = vec3(0.0,0.0,0.0);
+    vec3 Ka = vec3(0.2,0.2,0.2);
+    float q = 1.0;
+
+    float lambert = max(0,dot(n,l));
+
+    float phong = pow(max(0,dot(n,h)),q);
+
+    colorGouraud = Kd * (lambert + 0.01) + Ks * phong + Ka;
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;
