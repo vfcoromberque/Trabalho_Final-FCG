@@ -123,10 +123,10 @@ void main()
 
         // PREENCHA AQUI
         // Propriedades espectrais do coelho
-        Kd = vec3(1.0,1.0,1.0);
-        Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
-        q = 1.0;
+        Kd = vec3(0.08,0.4,0.8);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.2,0.4);
+        q = 32.0;
 
         // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
         // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
@@ -137,20 +137,20 @@ void main()
         // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
         // Veja também a Questão 4 do Questionário 4 no Moodle.
 
-        float minx = bbox_min.x;
-        float maxx = bbox_max.x;
+        //float minx = bbox_min.x;
+        //float maxx = bbox_max.x;
 
-        float miny = bbox_min.y;
-        float maxy = bbox_max.y;
+        //float miny = bbox_min.y;
+        //float maxy = bbox_max.y;
 
-        float minz = bbox_min.z;
-        float maxz = bbox_max.z;
+        //float minz = bbox_min.z;
+        //float maxz = bbox_max.z;
 
-        float p_bunny_u = (position_model[0] - minx) / (maxx - minx);
-        float p_bunny_v = (position_model[1] - miny) / (maxy - miny);
+        //float p_bunny_u = (position_model[0] - minx) / (maxx - minx);
+        //float p_bunny_v = (position_model[1] - miny) / (maxy - miny);
 
-        U = p_bunny_u;
-        V = p_bunny_v;
+        //U = p_bunny_u;
+        //V = p_bunny_v;
     }
     else if ( object_id == PLANE )
     {
@@ -183,6 +183,8 @@ void main()
         q = 1.0;
     }
 
+    vec4 h = normalize(v + l);
+
     // Espectro da fonte de iluminação
     vec3 I = vec3(1.0,1.0,1.0); // PREENCH AQUI o espectro da fonte de luz
 
@@ -196,7 +198,7 @@ void main()
     vec3 ambient_term = Ka*Ia; // PREENCHA AQUI o termo ambiente
 
     // Termo especular utilizando o modelo de iluminação de Phong
-    vec3 phong_specular_term  = Ks*I*pow(max(0,dot(r,v)),q); // PREENCH AQUI o termo especular de Phong
+    vec3 phong_specular_term  = Ks*I*pow(max(0,dot(n,h)),q); // PREENCH AQUI o termo especular de Phong
 
     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
     vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
