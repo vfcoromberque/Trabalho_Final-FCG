@@ -201,7 +201,7 @@ bool move_a;
 bool move_s;
 bool move_d;
 
-bool camera = false;
+bool isFirstPerson = false;
 
 float pos_MC_x = 0;
 float pos_MC_y = 0;
@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
     // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(1280, 720, "INF01047 - 00302369 - Vinicius Fraga Coromberque -- 00268613 -- Mateus Nunes Campos ", NULL, NULL);
+    window = glfwCreateWindow(1280, 720, "INF01047 - 00302369 - Vinicius Fraga Coromberque", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -326,9 +326,20 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
+    float current_time = 0;
+    float variation_time = 0;
+    float last_time = 0;
+
+    float cameraSpeed = 3.0f;
+
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
+
+        current_time = static_cast<float>(glfwGetTime());
+        variation_time = current_time - last_time;
+        last_time = current_time;
+
         // Aqui executamos as operações de renderização
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -364,7 +375,7 @@ int main(int argc, char* argv[])
         glm::vec4 camera_up_vector;
         glm::vec4 camera_lookat_l;
 
-        if (!camera){
+        if (!isFirstPerson){
             camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
             camera_lookat_l    = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
@@ -382,24 +393,24 @@ int main(int argc, char* argv[])
         // glm::vec4 v = crossproduct(w,u);
 
         if(move_w){
-            pos_MC_x += -w.x * 0.005f;
+            pos_MC_x += -w.x * variation_time * cameraSpeed;
             //pos_MC_y += -w.y * 0.005f;
-            pos_MC_z += -w.z * 0.005f;
+            pos_MC_z += -w.z * variation_time * cameraSpeed;
         }
         if(move_a){
-            pos_MC_x += -u.x * 0.005f;
+            pos_MC_x += -u.x * variation_time * cameraSpeed;
             //pos_MC_y += -u.y * 0.005f;
-            pos_MC_z += -u.z * 0.005f;
+            pos_MC_z += -u.z * variation_time * cameraSpeed;
         }
         if(move_s){
-            pos_MC_x += +w.x * 0.005f;
+            pos_MC_x += +w.x * variation_time * cameraSpeed;
             //pos_MC_y += +w.y * 0.005f;
-            pos_MC_z += +w.z * 0.005f;
+            pos_MC_z += +w.z * variation_time * cameraSpeed;
         }
         if(move_d){
-            pos_MC_x += +u.x * 0.005f;
+            pos_MC_x += +u.x * variation_time * cameraSpeed;
             //pos_MC_y += +u.y * 0.005f;
-            pos_MC_z += +u.z * 0.005f;
+            pos_MC_z += +u.z * variation_time * cameraSpeed;
         }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
@@ -472,7 +483,7 @@ int main(int argc, char* argv[])
         DrawVirtualObject("plane");
 
 
-        if(!camera){
+        if(!isFirstPerson){
             model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
                 * Matrix_Scale(1.0f,1.0f,1.0f)
                 * Matrix_Rotate_Y(g_CameraTheta);
@@ -481,7 +492,7 @@ int main(int argc, char* argv[])
             DrawVirtualObject("bunny");
         }
 
-        if(camera){
+        if(isFirstPerson){
             model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
                 * Matrix_Scale(1.0f,1.0f,1.0f)
                 * Matrix_Rotate_Y(-g_CameraTheta);
@@ -1137,7 +1148,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     // Assim, temos que o usuário consegue controlar a câmera.
 
 
-    if(!camera){
+    if(!isFirstPerson){
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
@@ -1162,7 +1173,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         g_LastCursorPosY = ypos;
     }
 
-    if(camera){
+    if(isFirstPerson){
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
@@ -1359,10 +1370,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS)
     {
-        if(!camera){
-            camera = true;
+        if(!isFirstPerson){
+            isFirstPerson = true;
         }else{
-            camera = false;
+            isFirstPerson = false;
         }
     }
 }
