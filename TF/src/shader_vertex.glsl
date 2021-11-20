@@ -78,11 +78,12 @@ void main()
     vec3 Ka = vec3(0.2,0.2,0.2);
     float q = 1.0;
 
+    vec3 I = vec3(1.0,1.0,1.0);
     float lambert = max(0,dot(n,l));
+    float blinnPhong = pow(max(0,dot(n,h)),q);
+    vec3 Ia = vec3(0.2,0.2,0.2);
 
-    float phong = pow(max(0,dot(n,h)),q);
-
-    colorGouraud = Kd * (lambert + 0.01) + Ks * phong + Ka;
+    colorGouraud = Kd * I * lambert + Ks * I * blinnPhong + Ka*Ia + 0.01;
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;

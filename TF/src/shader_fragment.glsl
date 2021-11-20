@@ -202,7 +202,7 @@ void main()
     vec3 ambient_term = Ka*Ia; // PREENCHA AQUI o termo ambiente
 
     // Termo especular utilizando o modelo de iluminação de Phong
-    vec3 phong_specular_term  = Ks*I*pow(max(0,dot(n,h)),q); // PREENCH AQUI o termo especular de Phong
+    vec3 blinn_phong_specular_term  = Ks*I*pow(max(0,dot(n,h)),q); // PREENCH AQUI o termo especular de Phong
 
     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
     vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
@@ -214,11 +214,11 @@ void main()
 
     if ( object_id == PLANE ){
 
-        color = Kd2 * (lambert_diffuse_term + ambient_term + phong_specular_term + 0.01);
+        color = Kd2 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
 
     }else{
 
-        color = Kd0 * (lambert_diffuse_term + ambient_term + phong_specular_term + 0.01);
+        color = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
 
     }
 
