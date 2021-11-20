@@ -23,7 +23,8 @@ uniform mat4 projection;
 #define SPHERE 0
 #define BUNNY  1
 #define PLANE  2
-#define MALE   3
+#define HEAD   3
+#define COW    4
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -171,12 +172,19 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
     }
-    else if (object_id == MALE){
+    else if (object_id == HEAD){
+        Kd = vec3(0.08,0.4,0.8);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.2,0.4);
+        q = 32.0;
 
-        Kd = vec3(0.1,0.1,0.1);
-        Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
-        q = 1.0;
+    }
+
+        else if (object_id == COW){
+        Kd = vec3(0.08,0.4,0.8);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.2,0.4);
+        q = 32.0;
 
     }
     else // Objeto desconhecido = preto
