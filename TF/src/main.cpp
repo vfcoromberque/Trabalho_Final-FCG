@@ -199,6 +199,7 @@ GLuint g_NumLoadedTextures = 0;
 bool move_w;
 bool move_a;
 bool move_s;
+bool move_space;
 bool move_d;
 
 bool isFirstPerson = false;
@@ -381,9 +382,10 @@ int main(int argc, char* argv[])
         glm::vec4 camera_view_vector;
         glm::vec4 camera_up_vector;
         glm::vec4 camera_lookat_l;
+        float cameraOffset = 4.0f;
 
         if (!isFirstPerson){
-            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(pos_MC_x,y,pos_MC_z+cameraOffset,1.0f); // Ponto "c", centro da câmera
             camera_lookat_l    = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
             camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
@@ -399,10 +401,11 @@ int main(int argc, char* argv[])
         glm::vec4 u = crossproduct(camera_up_vector,w)/norm(crossproduct(camera_up_vector,w));
         // glm::vec4 v = crossproduct(w,u);
 
+
         if(move_w){
-            pos_MC_x += -w.x * variation_time * characterSpeed;
+            pos_MC_x += w.x * variation_time * characterSpeed;
             //pos_MC_y += -w.y * 0.005f;
-            pos_MC_z += -w.z * variation_time * characterSpeed;
+            pos_MC_z += w.z * variation_time * characterSpeed;
         }
         if(move_a){
             pos_MC_x += -u.x * variation_time * characterSpeed;
@@ -410,14 +413,18 @@ int main(int argc, char* argv[])
             pos_MC_z += -u.z * variation_time * characterSpeed;
         }
         if(move_s){
-            pos_MC_x += +w.x * variation_time * characterSpeed;
+            pos_MC_x += -w.x * variation_time * characterSpeed;
             //pos_MC_y += +w.y * 0.005f;
-            pos_MC_z += +w.z * variation_time * characterSpeed;
+            pos_MC_z += -w.z * variation_time * characterSpeed;
         }
         if(move_d){
             pos_MC_x += +u.x * variation_time * characterSpeed;
             //pos_MC_y += +u.y * 0.005f;
             pos_MC_z += +u.z * variation_time * characterSpeed;
+        }
+        if(move_space){
+
+
         }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
@@ -509,8 +516,8 @@ int main(int argc, char* argv[])
                 * Matrix_Scale(1.0f,1.0f,1.0f)
                 * Matrix_Rotate_Y(g_CameraTheta);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, BUNNY);
-            DrawVirtualObject("bunny");
+            glUniform1i(object_id_uniform, HEAD);
+            DrawVirtualObject("head");
         }
 
         if(isFirstPerson){
@@ -518,8 +525,8 @@ int main(int argc, char* argv[])
                 * Matrix_Scale(1.0f,1.0f,1.0f)
                 * Matrix_Rotate_Y(-g_CameraTheta);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, BUNNY);
-            DrawVirtualObject("bunny");
+            glUniform1i(object_id_uniform, HEAD);
+            DrawVirtualObject("head");
         }
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1368,6 +1375,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         move_d = true;
     }
 
+    if ( key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+
+        move_space = true;
+    }
+
 
     if (key == GLFW_KEY_W && action == GLFW_RELEASE)
     {
@@ -1387,6 +1400,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_D && action == GLFW_RELEASE)
     {
         move_d = false;
+    }
+
+    if ( key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
+    {
+
+        move_space = false;
     }
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS)
