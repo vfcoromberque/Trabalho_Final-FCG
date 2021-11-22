@@ -18,6 +18,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 
 // Headers abaixo são específicos de C++
 #include <map>
@@ -29,6 +30,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <chrono>
+#include <iostream>
+
 
 // Headers das bibliotecas OpenGL
 #include <glad/glad.h>   // Criação de contexto OpenGL 3.3
@@ -339,7 +343,8 @@ int main(int argc, char* argv[])
 
     float characterSpeed = 3.0f;
 
-
+            float x_inc  = 0.0f;
+        float z_inc = 0.0f;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -486,29 +491,23 @@ int main(int argc, char* argv[])
 #define COW    4
 
         // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,0.0f,0.0f)
-                * Matrix_Rotate_Z(0.6f)
-                * Matrix_Rotate_X(0.2f)
-                * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+        model = Matrix_Translate(-1.0f,0.0f,0.0f);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, SPHERE);
         DrawVirtualObject("sphere");
 
         // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f,0.0f,0.0f)
-                * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+        model = Matrix_Translate(1.0f,0.0f,0.0f);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
 
-        model = Matrix_Translate(5.0f,0.0f,0.0f)
-                * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+        model = Matrix_Translate(5.0f,0.0f,0.0f);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, HEAD);
         DrawVirtualObject("head");
 
-        model = Matrix_Translate(3.0f,0.0f,0.0f)
-                * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+        model = Matrix_Translate(3.0f,0.0f,0.0f);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, COW);
         DrawVirtualObject("cow");
@@ -542,19 +541,46 @@ int main(int argc, char* argv[])
             DrawVirtualObject("head");
         }
 
+
         bool spacePressed;
         bool spaceCurrentlyPressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+        bool bulletShot;
+        float timeShot;
+        glm::vec3 position;
+        float bulletSpeed = 8.0f;
 
 
-        if(true)
+        if(!spacePressed && spaceCurrentlyPressed)
         {
+            bulletShot = true;
+            z_inc = 0;
+            x_inc = 0;
+            timeShot = (float) glfwGetTime();
+            position = glm::vec3(pos_MC_x, pos_MC_y, pos_MC_z);
+            spacePressed = false;
+
+
+        }
+
+
+        if(bulletShot == true){
+
+            if((float)glfwGetTime() - timeShot >= 3.0f){
+
+                bulletShot = false;
+            }
+
+
 
             BuildTrianglesAndAddToVirtualScene(&spheremodel);
-            model = Matrix_Translate(pos_MC_x, pos_MC_y, pos_MC_z + 2.0f);
+            model = Matrix_Translate(position.x + x_inc * 0.1f  ,pos_MC_y,  position.z + z_inc * 0.1f) * Matrix_Scale(0.1f,0.1f,0.1f);
             glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(object_id_uniform, HEAD);
 
             DrawVirtualObject("sphere");
+
+            ++z_inc;
+            ++x_inc;
         }
         spacePressed = spaceCurrentlyPressed;
 
