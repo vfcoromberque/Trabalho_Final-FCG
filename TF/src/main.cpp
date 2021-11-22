@@ -343,8 +343,9 @@ int main(int argc, char* argv[])
 
     float characterSpeed = 3.0f;
 
-            float x_inc  = 0.0f;
-        float z_inc = 0.0f;
+    float x_inc  = 0.0f;
+    float z_inc = 0.0f;
+    float y_inc = 0.0f;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -377,14 +378,16 @@ int main(int argc, char* argv[])
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
         // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
         // e ScrollCallback().
-        float r = g_CameraDistance;
+
+        float r = -0.1f;
         float y = r*sin(g_CameraPhi);
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
-        float y_Terceira_Pessoa = r*sin(g_CameraPhi) + pos_MC_y;
-        float z_Terceira_Pessoa = r*cos(g_CameraPhi)*cos(g_CameraTheta) + pos_MC_z;
-        float x_Terceira_Pessoa = r*cos(g_CameraPhi)*sin(g_CameraTheta) + pos_MC_x;
+        float r_Terceira_Pessoa = g_CameraDistance;
+        float y_Terceira_Pessoa = r_Terceira_Pessoa*sin(g_CameraPhi) + pos_MC_y;
+        float z_Terceira_Pessoa = r_Terceira_Pessoa*cos(g_CameraPhi)*cos(g_CameraTheta) + pos_MC_z;
+        float x_Terceira_Pessoa = r_Terceira_Pessoa*cos(g_CameraPhi)*sin(g_CameraTheta) + pos_MC_x;
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -406,7 +409,7 @@ int main(int argc, char* argv[])
 
         if (isFirstPerson)
         {
-            camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z ,1.0f); // Ponto "c", centro da câmera
             camera_view_vector = glm::vec4(x,y,-z,0.0f); // Vetor "view", sentido para onde a câmera está virada
         }
 
@@ -414,6 +417,8 @@ int main(int argc, char* argv[])
 
         glm::vec4 w = -camera_view_vector_AUX/norm(camera_view_vector_AUX);
         glm::vec4 u = crossproduct(camera_up_vector,w)/norm(crossproduct(camera_up_vector,w));
+
+        glm::vec4 w_aux = -camera_view_vector/norm(camera_view_vector);
         // glm::vec4 v = crossproduct(w,u);
 
 
@@ -471,9 +476,9 @@ int main(int argc, char* argv[])
             // utilizando a variável g_CameraDistance.
             float t = 1.5f*g_CameraDistance/2.5f;
             float b = -t;
-            float r = t*g_ScreenRatio;
-            float l = -r;
-            projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
+            float r_Terceira_Pessoa = t*g_ScreenRatio;
+            float l = -r_Terceira_Pessoa;
+            projection = Matrix_Orthographic(l, r_Terceira_Pessoa, b, t, nearplane, farplane);
         }
 
         glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
@@ -547,17 +552,23 @@ int main(int argc, char* argv[])
         bool bulletShot;
         float timeShot;
         glm::vec3 position;
-        float bulletSpeed = 8.0f;
-
+        float bulletSpeed = 50.0f;
+        float zBulletDirection;
+        float xBulletDirection;
+        float yBulletDirection;
 
         if(!spacePressed && spaceCurrentlyPressed)
         {
             bulletShot = true;
             z_inc = 0;
             x_inc = 0;
+            y_inc = 0;
             timeShot = (float) glfwGetTime();
             position = glm::vec3(pos_MC_x, pos_MC_y, pos_MC_z);
             spacePressed = false;
+            zBulletDirection = -w_aux.z;
+            xBulletDirection = -w_aux.x;
+            yBulletDirection = -w_aux.y;
 
 
         }
@@ -573,14 +584,15 @@ int main(int argc, char* argv[])
 
 
             BuildTrianglesAndAddToVirtualScene(&spheremodel);
-            model = Matrix_Translate(position.x + x_inc * 0.1f  ,pos_MC_y,  position.z + z_inc * 0.1f) * Matrix_Scale(0.1f,0.1f,0.1f);
+            model = Matrix_Translate(position.x + x_inc, position.y + y_inc,  position.z + z_inc) * Matrix_Scale(0.1f,0.1f,0.1f);
             glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(object_id_uniform, HEAD);
 
             DrawVirtualObject("sphere");
 
-            ++z_inc;
-            ++x_inc;
+            z_inc += zBulletDirection * variation_time * bulletSpeed;
+            x_inc += xBulletDirection * variation_time * bulletSpeed;
+            y_inc += yBulletDirection * variation_time * bulletSpeed;
         }
         spacePressed = spaceCurrentlyPressed;
 
@@ -1268,7 +1280,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
         // Atualizamos parâmetros da câmera com os deslocamentos
         g_CameraTheta += variation_time * sensivity * dx;
-        g_CameraPhi   -= variation_time * sensivity * dy;
+        g_CameraPhi   += variation_time * sensivity * dy;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
         float phimax = 3.141592f/2;
