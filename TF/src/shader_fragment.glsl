@@ -25,6 +25,7 @@ uniform mat4 projection;
 #define PLANE  2
 #define HEAD   3
 #define COW    4
+#define PLANE_WALL 5
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -35,6 +36,8 @@ uniform vec4 bbox_max;
 uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
+uniform sampler2D TextureImage3;
+uniform sampler2D TextureImage4;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -172,6 +175,18 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
     }
+    else if (object_id == PLANE_WALL){
+
+        Kd = vec3(0.1,0.1,0.1);
+        Ks = vec3(0.0,0.0,0.0);
+        Ka = vec3(0.0,0.0,0.0);
+        q = 1.0;
+
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+    }
     else if (object_id == HEAD){
         Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
@@ -179,8 +194,7 @@ void main()
         q = 32.0;
 
     }
-
-        else if (object_id == COW){
+    else if (object_id == COW){
         Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
         Ka = vec3(0.04,0.2,0.4);
@@ -217,12 +231,18 @@ void main()
 
     vec3 Kd2 = texture(TextureImage2, vec2(U,V)).rgb;
 
+    vec3 Kd3 = texture(TextureImage3, vec2(U,V)).rgb;
+
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
     if ( object_id == PLANE ){
 
         color = Kd2 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
+
+    }else if(object_id == PLANE_WALL){
+
+        color = Kd3 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
 
     }else{
 

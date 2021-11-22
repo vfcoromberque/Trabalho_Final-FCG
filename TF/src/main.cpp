@@ -458,7 +458,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -30.0f; // Posição do "far plane"
+        float farplane  = -50.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -494,6 +494,7 @@ int main(int argc, char* argv[])
 #define PLANE  2
 #define HEAD   3
 #define COW    4
+#define PLANE_WALL 5
 
         // Desenhamos o modelo da esfera
         model = Matrix_Translate(-1.0f,0.0f,0.0f);
@@ -520,11 +521,39 @@ int main(int argc, char* argv[])
 
         // Desenhamos o plano do chão
         model = Matrix_Translate(0.0f,-1.1f,0.0f)
-                * Matrix_Scale(40.0f,40.0f,40.0f);
+                * Matrix_Scale(30.0f,30.0f,30.0f);
         glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANE);
         DrawVirtualObject("plane");
 
+
+        model = Matrix_Translate(0.0f,3.85f,30.0f)
+                * Matrix_Scale(30.0f,5.0f,0.0f)
+                * Matrix_Rotate_X(-1.5708f);
+        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE_WALL);
+        DrawVirtualObject("plane");
+
+        model = Matrix_Translate(0.0f,3.85f,-30.0f)
+                * Matrix_Scale(30.0f,5.0f,0.0f)
+                * Matrix_Rotate_X(1.5708f);
+        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE_WALL);
+        DrawVirtualObject("plane");
+
+        model = Matrix_Translate(30.0f,3.85f,0.0f)
+                * Matrix_Scale(0.0f,5.0f,30.0f)
+                * Matrix_Rotate_Z(1.5708f);
+        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE_WALL);
+        DrawVirtualObject("plane");
+
+        model = Matrix_Translate(-30.0f,3.85f,0.0f)
+                * Matrix_Scale(0.0f,5.0f,30.0f)
+                * Matrix_Rotate_Z(-1.5708f);
+        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE_WALL);
+        DrawVirtualObject("plane");
 
         if(!isFirstPerson)
         {
@@ -770,6 +799,7 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage2"), 2);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
     glUseProgram(0);
 }
 
