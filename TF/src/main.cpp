@@ -377,6 +377,10 @@ int main(int argc, char* argv[])
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
+        float y_Terceira_Pessoa = r*sin(g_CameraPhi) + pos_MC_y;
+        float z_Terceira_Pessoa = r*cos(g_CameraPhi)*cos(g_CameraTheta) + pos_MC_z;
+        float x_Terceira_Pessoa = r*cos(g_CameraPhi)*sin(g_CameraTheta) + pos_MC_x;
+
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
 
@@ -384,23 +388,24 @@ int main(int argc, char* argv[])
         glm::vec4 camera_view_vector;
         glm::vec4 camera_up_vector;
         glm::vec4 camera_lookat_l;
-        float cameraOffset = 4.0f;
+        //float cameraOffset = 4.0f;
+
+        camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
         if (!isFirstPerson)
         {
-            camera_position_c  = glm::vec4(pos_MC_x,y,pos_MC_z+cameraOffset,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(x_Terceira_Pessoa,y_Terceira_Pessoa,z_Terceira_Pessoa,1.0f); // Ponto "c", centro da câmera
             camera_lookat_l    = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
         }
-        else
+
+        if (isFirstPerson)
         {
             camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z,1.0f); // Ponto "c", centro da câmera
             camera_view_vector = glm::vec4(x,y,-z,0.0f); // Vetor "view", sentido para onde a câmera está virada
-            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
         }
 
-        glm::vec4 camera_view_vector_AUX = glm::vec4(x,y,-z,0.0f); // Vetor "view", sentido para onde a câmera está virada;
+        glm::vec4 camera_view_vector_AUX = glm::vec4(camera_view_vector.x,0.0f,camera_view_vector.z,0.0f); // Vetor "view", sentido para onde a câmera está virada;
 
         glm::vec4 w = -camera_view_vector_AUX/norm(camera_view_vector_AUX);
         glm::vec4 u = crossproduct(camera_up_vector,w)/norm(crossproduct(camera_up_vector,w));
@@ -409,9 +414,9 @@ int main(int argc, char* argv[])
 
         if(move_w)
         {
-            pos_MC_x += w.x * variation_time * characterSpeed;
+            pos_MC_x += -w.x * variation_time * characterSpeed;
             //pos_MC_y += -w.y * 0.005f;
-            pos_MC_z += w.z * variation_time * characterSpeed;
+            pos_MC_z += -w.z * variation_time * characterSpeed;
         }
         if(move_a)
         {
@@ -421,9 +426,9 @@ int main(int argc, char* argv[])
         }
         if(move_s)
         {
-            pos_MC_x += -w.x * variation_time * characterSpeed;
+            pos_MC_x += w.x * variation_time * characterSpeed;
             //pos_MC_y += +w.y * 0.005f;
-            pos_MC_z += -w.z * variation_time * characterSpeed;
+            pos_MC_z += w.z * variation_time * characterSpeed;
         }
         if(move_d)
         {
