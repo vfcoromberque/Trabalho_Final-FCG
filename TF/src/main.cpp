@@ -546,11 +546,11 @@ int main(int argc, char* argv[])
         bool spaceCurrentlyPressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
 
 
-        if(!spacePressed && spaceCurrentlyPressed)
+        if(true)
         {
 
             BuildTrianglesAndAddToVirtualScene(&spheremodel);
-            model = Matrix_Translate(pos_MC_x, pos_MC_y, pos_MC_z-2.0f);
+            model = Matrix_Translate(pos_MC_x, pos_MC_y, pos_MC_z + 2.0f);
             glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(object_id_uniform, HEAD);
 
