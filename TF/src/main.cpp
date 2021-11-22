@@ -170,7 +170,7 @@ bool g_MouseMovement = false;
 // renderização.
 float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
 float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
-float g_CameraDistance = 3.5f; // Distância da câmera para a origem
+float g_CameraDistance = 5.0f; // Distância da câmera para a origem
 
 // Variáveis que controlam rotação do antebraço
 float g_ForearmAngleZ = 0.0f;
@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
         // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
         // e ScrollCallback().
 
-        float r = -0.1f;
+        float r = -0.16f;
         float y = r*sin(g_CameraPhi);
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
@@ -403,14 +403,14 @@ int main(int argc, char* argv[])
         if (!isFirstPerson)
         {
             camera_position_c  = glm::vec4(x_Terceira_Pessoa,y_Terceira_Pessoa,z_Terceira_Pessoa,1.0f); // Ponto "c", centro da câmera
-            camera_lookat_l    = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_lookat_l    = glm::vec4(pos_MC_x,pos_MC_y + 1.7f,pos_MC_z,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
         if (isFirstPerson)
         {
-            camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y,pos_MC_z ,1.0f); // Ponto "c", centro da câmera
-            camera_view_vector = glm::vec4(x,y,-z,0.0f); // Vetor "view", sentido para onde a câmera está virada
+            camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y + 0.3f,pos_MC_z ,1.0f); // Ponto "c", centro da câmera
+            camera_view_vector = glm::vec4(x,y,z,0.0f); // Vetor "view", sentido para onde a câmera está virada
         }
 
         glm::vec4 camera_view_vector_AUX = glm::vec4(camera_view_vector.x,0.0f,camera_view_vector.z,0.0f); // Vetor "view", sentido para onde a câmera está virada;
@@ -540,7 +540,7 @@ int main(int argc, char* argv[])
         {
             model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
                     * Matrix_Scale(1.0f,1.0f,1.0f)
-                    * Matrix_Rotate_Y(-g_CameraTheta);
+                    * Matrix_Rotate_Y(g_CameraTheta);
             glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(object_id_uniform, HEAD);
             DrawVirtualObject("head");
@@ -1279,7 +1279,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da câmera com os deslocamentos
-        g_CameraTheta += variation_time * sensivity * dx;
+        g_CameraTheta -= variation_time * sensivity * dx;
         g_CameraPhi   += variation_time * sensivity * dy;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
