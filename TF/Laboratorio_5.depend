@@ -5390,10 +5390,11 @@
 	<inttypes.h>
 	<stdint.h>
 
-1637555876 source:c:\users\nunes\desktop\new folder\trabalho_final-fcg\tf\src\main.cpp
+1637623551 source:c:\users\nunes\desktop\new folder\trabalho_final-fcg\tf\src\main.cpp
 	<cmath>
 	<cstdio>
 	<cstdlib>
+	<ctime>
 	<map>
 	<stack>
 	<string>
@@ -5403,6 +5404,8 @@
 	<sstream>
 	<stdexcept>
 	<algorithm>
+	<chrono>
+	<iostream>
 	<glad/glad.h>
 	<GLFW/glfw3.h>
 	<glm/mat4x4.hpp>

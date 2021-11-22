@@ -613,7 +613,7 @@ int main(int argc, char* argv[])
 
 
             BuildTrianglesAndAddToVirtualScene(&spheremodel);
-            model = Matrix_Translate(position.x + x_inc, position.y + y_inc,  position.z + z_inc) * Matrix_Scale(0.1f,0.1f,0.1f);
+            model = Matrix_Translate(position.x + x_inc, position.y + y_inc,  position.z + z_inc) * Matrix_Scale(0.3f,0.3f,0.3f);
             glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(object_id_uniform, HEAD);
 
