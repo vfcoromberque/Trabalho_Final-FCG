@@ -553,7 +553,7 @@ int main(int argc, char* argv[])
         bool bulletShot;
         float timeShot;
         glm::vec3 position;
-        float bulletSpeed = 50.0f;
+        float bulletSpeed = 5000.0f;
         float zBulletDirection;
         float xBulletDirection;
         float yBulletDirection;
