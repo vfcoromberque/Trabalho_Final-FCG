@@ -218,6 +218,8 @@ float last_time = 0;
 
 float sensivity = 3.0f;
 
+float t = 0;
+
 int main(int argc, char* argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -418,7 +420,6 @@ int main(int argc, char* argv[])
         glm::vec4 w = -camera_view_vector_AUX/norm(camera_view_vector_AUX);
         glm::vec4 u = crossproduct(camera_up_vector,w)/norm(crossproduct(camera_up_vector,w));
 
-        glm::vec4 w_aux = -camera_view_vector/norm(camera_view_vector);
         // glm::vec4 v = crossproduct(w,u);
 
 
@@ -488,6 +489,10 @@ int main(int argc, char* argv[])
         // efetivamente aplicadas em todos os pontos.
         glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+
+
 
 #define SPHERE 0
 #define BUNNY  1
@@ -586,42 +591,98 @@ int main(int argc, char* argv[])
         float xBulletDirection;
         float yBulletDirection;
 
+        glm::vec4 w_aux;
+
         if(!spacePressed && spaceCurrentlyPressed)
         {
+
+            w_aux = -camera_view_vector/norm(camera_view_vector);
             bulletShot = true;
             z_inc = 0;
             x_inc = 0;
             y_inc = 0;
+            t = 0;
             timeShot = (float) glfwGetTime();
             position = glm::vec3(pos_MC_x, pos_MC_y, pos_MC_z);
             spacePressed = false;
-            zBulletDirection = -w_aux.z;
-            xBulletDirection = -w_aux.x;
-            yBulletDirection = -w_aux.y;
 
 
         }
 
 
+
         if(bulletShot == true){
 
-            if((float)glfwGetTime() - timeShot >= 3.0f){
 
+            //if((float)glfwGetTime() - timeShot >= 3.0f){
+
+            //    bulletShot = false;
+            //}
+
+
+            glm::vec4 curva_aux = glm::vec4(0.0f,-1.0f,0.0f,1.0f);
+
+            glm::vec4 w_p2 = w_aux;
+            w_p2 += curva_aux;
+
+            glm::vec4 w_p3 = w_aux;
+            w_p3 += curva_aux;
+
+            glm::vec4 p1 = glm::vec4(position.x,position.y,position.z,0.0f);
+            glm::vec4 p2 = p1 - w_p2 * glm::vec4(6.0f,1.0f + w.y,6.0f,0.0f);
+            glm::vec4 p3 = p1 - w_p3 * glm::vec4(12.0f,1.0f + w.y,12.0f,0.0f);
+            glm::vec4 p4 = p1 - w_aux * glm::vec4(18.0f,0.5f + w.y ,18.0f,0.0f);
+
+
+
+            glm::vec4 c12 = p1 + t*(p2-p1);
+            glm::vec4 c23 = p2 + t*(p3-p2);
+            glm::vec4 c34 = p3 + t*(p4-p3);
+            glm::vec4 c123 = c12 + t*(c23 - c12);
+            glm::vec4 c234 = c23 + t*(c34 - c23);
+            glm::vec4 c = c123 + t*(c234 - c123);
+
+            if((float)glfwGetTime() - timeShot >= variation_time){
+
+                t += 0.0007;
+            }
+            //t += 0.0001;
+
+            if(t>=1){
+                t = 0;
                 bulletShot = false;
             }
 
 
+            c12 = p1 + t*(p2-p1);
+            c23 = p2 + t*(p3-p2);
+            c34 = p3 + t*(p4-p3);
+            c123 = c12 + t*(c23 - c12);
+            c234 = c23 + t*(c34 - c23);
+            glm::vec4 c_prox = c123 + t*(c234 - c123);
 
-            BuildTrianglesAndAddToVirtualScene(&spheremodel);
-            model = Matrix_Translate(position.x + x_inc, position.y + y_inc,  position.z + z_inc) * Matrix_Scale(0.3f,0.3f,0.3f);
-            glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-            glUniform1i(object_id_uniform, HEAD);
+            glm::vec4 c_dir = c_prox - c;
 
-            DrawVirtualObject("sphere");
+
+            zBulletDirection = c_dir.z;
+            xBulletDirection = c_dir.x;
+            yBulletDirection = c_dir.y;
+
+            if((float)glfwGetTime() - timeShot >= variation_time){
+
+                BuildTrianglesAndAddToVirtualScene(&spheremodel);
+                model = Matrix_Translate(c.x + x_inc, c.y + y_inc,  c.z + z_inc) * Matrix_Scale(0.1f,0.1f,0.1f);
+                glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+                glUniform1i(object_id_uniform, HEAD);
+
+                DrawVirtualObject("sphere");
+            }
 
             z_inc += zBulletDirection * variation_time * bulletSpeed;
             x_inc += xBulletDirection * variation_time * bulletSpeed;
             y_inc += yBulletDirection * variation_time * bulletSpeed;
+
+
         }
         spacePressed = spaceCurrentlyPressed;
 
