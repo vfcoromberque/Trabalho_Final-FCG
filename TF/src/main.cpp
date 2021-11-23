@@ -539,7 +539,7 @@ int main(int argc, char* argv[])
         {
             model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
                     * Matrix_Scale(5.0f,5.0f,5.0f)
-                    * Matrix_Rotate_Y(g_CameraTheta);
+                    * Matrix_Rotate_Y(g_CameraTheta - 1.5f);
             spawnEntity(model, GUN, "gun");
         }
 
