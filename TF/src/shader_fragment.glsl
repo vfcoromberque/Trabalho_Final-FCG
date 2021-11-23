@@ -26,6 +26,7 @@ uniform mat4 projection;
 #define HEAD   3
 #define COW    4
 #define PLANE_WALL 5
+#define GUN 6
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -188,18 +189,24 @@ void main()
 
     }
     else if (object_id == HEAD){
+        Kd = vec3(0.1,3.0,0.1);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.2,0.4);
+        q = 32.0;
+
+    }
+    else if (object_id == COW) {
         Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
         Ka = vec3(0.04,0.2,0.4);
         q = 32.0;
 
     }
-    else if (object_id == COW){
-        Kd = vec3(0.08,0.4,0.8);
-        Ks = vec3(0.8,0.8,0.8);
-        Ka = vec3(0.04,0.2,0.4);
+    else if (object_id == GUN){
+        Kd = vec3(0.0, 0.0, 0.0);
+        Ks = vec3(0.8, 0.8, 0.8);
+        Ka = vec3(0.04, 0.2, 0.4);
         q = 32.0;
-
     }
     else // Objeto desconhecido = preto
     {
@@ -255,8 +262,14 @@ void main()
     if(object_id == SPHERE){
 
         color = colorGouraud;
-
-    }else
+    }
+    if(object_id == GUN){
+        color = pow(color, vec3(0.35, 0.35, 0.35)/2.2);
+    }
+   if(object_id == HEAD){
+        color = pow(color, vec3(0.0,1,4.2)/2.2);
+    }
+    else
 
     color = pow(color, vec3(1.0,1.0,1.0)/2.2);
 }

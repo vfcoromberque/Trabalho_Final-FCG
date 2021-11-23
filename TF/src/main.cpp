@@ -52,6 +52,15 @@
 #include "utils.h"
 #include "matrices.h"
 
+#define SPHERE 0
+#define BUNNY  1
+#define PLANE  2
+#define HEAD   3
+#define COW    4
+#define PLANE_WALL 5
+#define GUN 6
+#define DEER 7
+
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
 struct ObjModel
@@ -124,6 +133,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
+
+//Funções de abstração de código
+void spawnEntity(glm::mat4 model, int objectID, const char* objectName);
 
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
@@ -320,6 +333,13 @@ int main(int argc, char* argv[])
     ComputeNormals(&cowmodel);
     BuildTrianglesAndAddToVirtualScene(&cowmodel);
 
+    ObjModel gunmodel("../../data/gun.obj");
+    ComputeNormals(&gunmodel);
+    BuildTrianglesAndAddToVirtualScene(&gunmodel);
+
+
+
+
     if ( argc > 1 )
     {
         ObjModel model(argv[1]);
@@ -344,6 +364,7 @@ int main(int argc, char* argv[])
     glm::mat4 the_view;
 
     float characterSpeed = 3.0f;
+    float spawnTimer = 0.0f;
 
     float x_inc  = 0.0f;
     float z_inc = 0.0f;
@@ -411,7 +432,7 @@ int main(int argc, char* argv[])
 
         if (isFirstPerson)
         {
-            camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y + 0.3f,pos_MC_z ,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(pos_MC_x,pos_MC_y + 0.3f,pos_MC_z,1.0f);  // Ponto "c", centro da câmera
             camera_view_vector = glm::vec4(x,y,z,0.0f); // Vetor "view", sentido para onde a câmera está virada
         }
 
@@ -491,96 +512,42 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
 
 
+        //Desenha o chão e as 4 paredes
+        spawnEntity(Matrix_Translate(0.0f,-1.1f,0.0f)
+                    * Matrix_Scale(30.0f,30.0f,30.0f), PLANE, "plane");
 
+        spawnEntity(Matrix_Translate(0.0f,3.85f,30.0f)
+                    * Matrix_Scale(30.0f,5.0f,0.0f)
+                    * Matrix_Rotate_X(-1.5708f), PLANE_WALL, "plane");
 
+        spawnEntity(Matrix_Translate(0.0f,3.85f,-30.0f)
+                    * Matrix_Scale(30.0f,5.0f,0.0f)
+                    * Matrix_Rotate_X(1.5708f), PLANE_WALL, "plane");
 
-#define SPHERE 0
-#define BUNNY  1
-#define PLANE  2
-#define HEAD   3
-#define COW    4
-#define PLANE_WALL 5
+        spawnEntity(Matrix_Translate(30.0f,3.85f,0.0f)
+                    * Matrix_Scale(0.0f,5.0f,30.0f)
+                    * Matrix_Rotate_Z(1.5708f), PLANE_WALL, "plane");
 
-        // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, SPHERE);
-        DrawVirtualObject("sphere");
+        spawnEntity(Matrix_Translate(-30.0f,3.85f,0.0f)
+                    * Matrix_Scale(0.0f,5.0f,30.0f)
+                    * Matrix_Rotate_Z(-1.5708f), PLANE_WALL, "plane");
 
-        // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
-
-        model = Matrix_Translate(5.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, HEAD);
-        DrawVirtualObject("head");
-
-        model = Matrix_Translate(3.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, COW);
-        DrawVirtualObject("cow");
-
-
-        // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f,-1.1f,0.0f)
-                * Matrix_Scale(30.0f,30.0f,30.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-
-
-        model = Matrix_Translate(0.0f,3.85f,30.0f)
-                * Matrix_Scale(30.0f,5.0f,0.0f)
-                * Matrix_Rotate_X(-1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
-
-        model = Matrix_Translate(0.0f,3.85f,-30.0f)
-                * Matrix_Scale(30.0f,5.0f,0.0f)
-                * Matrix_Rotate_X(1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
-
-        model = Matrix_Translate(30.0f,3.85f,0.0f)
-                * Matrix_Scale(0.0f,5.0f,30.0f)
-                * Matrix_Rotate_Z(1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
-
-        model = Matrix_Translate(-30.0f,3.85f,0.0f)
-                * Matrix_Scale(0.0f,5.0f,30.0f)
-                * Matrix_Rotate_Z(-1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
-
+        //Desenha o personagem principal
         if(!isFirstPerson)
         {
-            model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
-                    * Matrix_Scale(1.0f,1.0f,1.0f)
-                    * Matrix_Rotate_Y(g_CameraTheta);
-            glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-            glUniform1i(object_id_uniform, HEAD);
-            DrawVirtualObject("head");
+            spawnEntity(Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
+                        * Matrix_Scale(5.0f,5.0f,5.0f)
+                        * Matrix_Rotate_Y(g_CameraTheta - 1.55f), GUN, "gun");
         }
 
         if(isFirstPerson)
         {
-            model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
+            spawnEntity(Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
                     * Matrix_Scale(1.0f,1.0f,1.0f)
-                    * Matrix_Rotate_Y(g_CameraTheta);
-            glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-            glUniform1i(object_id_uniform, HEAD);
-            DrawVirtualObject("head");
+                    * Matrix_Rotate_Y(g_CameraTheta), GUN, "gun");
         }
 
-
+        //Funcionalidade de atirar ao apertar espaço e curva de bezier
         bool spacePressed;
         bool spaceCurrentlyPressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
         bool bulletShot;
@@ -595,7 +562,6 @@ int main(int argc, char* argv[])
 
         if(!spacePressed && spaceCurrentlyPressed)
         {
-
             w_aux = -camera_view_vector/norm(camera_view_vector);
             bulletShot = true;
             z_inc = 0;
@@ -605,36 +571,18 @@ int main(int argc, char* argv[])
             timeShot = (float) glfwGetTime();
             position = glm::vec3(pos_MC_x, pos_MC_y, pos_MC_z);
             spacePressed = false;
-
-
         }
-
-
-
-        if(bulletShot == true){
-
-
-            //if((float)glfwGetTime() - timeShot >= 3.0f){
-
-            //    bulletShot = false;
-            //}
-
-
+        if(bulletShot == true)
+        {
             glm::vec4 curva_aux = glm::vec4(0.0f,-1.0f,0.0f,1.0f);
-
             glm::vec4 w_p2 = w_aux;
             w_p2 += curva_aux;
-
             glm::vec4 w_p3 = w_aux;
             w_p3 += curva_aux;
-
             glm::vec4 p1 = glm::vec4(position.x,position.y,position.z,0.0f);
             glm::vec4 p2 = p1 - w_p2 * glm::vec4(6.0f,1.0f + w.y,6.0f,0.0f);
             glm::vec4 p3 = p1 - w_p3 * glm::vec4(12.0f,1.0f + w.y,12.0f,0.0f);
-            glm::vec4 p4 = p1 - w_aux * glm::vec4(18.0f,0.5f + w.y ,18.0f,0.0f);
-
-
-
+            glm::vec4 p4 = p1 - w_aux * glm::vec4(18.0f,0.5f + w.y,18.0f,0.0f);
             glm::vec4 c12 = p1 + t*(p2-p1);
             glm::vec4 c23 = p2 + t*(p3-p2);
             glm::vec4 c34 = p3 + t*(p4-p3);
@@ -642,89 +590,73 @@ int main(int argc, char* argv[])
             glm::vec4 c234 = c23 + t*(c34 - c23);
             glm::vec4 c = c123 + t*(c234 - c123);
 
-            if((float)glfwGetTime() - timeShot >= variation_time){
+            if((float)glfwGetTime() - timeShot >= variation_time)
+            {
 
                 t += 0.0007;
             }
             //t += 0.0001;
-
-            if(t>=1){
+            if(t>=1)
+            {
                 t = 0;
                 bulletShot = false;
             }
-
 
             c12 = p1 + t*(p2-p1);
             c23 = p2 + t*(p3-p2);
             c34 = p3 + t*(p4-p3);
             c123 = c12 + t*(c23 - c12);
             c234 = c23 + t*(c34 - c23);
+
             glm::vec4 c_prox = c123 + t*(c234 - c123);
-
             glm::vec4 c_dir = c_prox - c;
-
 
             zBulletDirection = c_dir.z;
             xBulletDirection = c_dir.x;
             yBulletDirection = c_dir.y;
+            if((float)glfwGetTime() - timeShot >= variation_time)
+            {
+                spawnEntity(Matrix_Translate(c.x + x_inc, c.y + y_inc,  c.z + z_inc) * Matrix_Scale(0.1f,0.1f,0.1f), SPHERE, "sphere");
 
-            if((float)glfwGetTime() - timeShot >= variation_time){
-
-                BuildTrianglesAndAddToVirtualScene(&spheremodel);
-                model = Matrix_Translate(c.x + x_inc, c.y + y_inc,  c.z + z_inc) * Matrix_Scale(0.1f,0.1f,0.1f);
-                glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-                glUniform1i(object_id_uniform, HEAD);
-
-                DrawVirtualObject("sphere");
             }
-
             z_inc += zBulletDirection * variation_time * bulletSpeed;
             x_inc += xBulletDirection * variation_time * bulletSpeed;
             y_inc += yBulletDirection * variation_time * bulletSpeed;
-
-
         }
         spacePressed = spaceCurrentlyPressed;
 
-        // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
-        // passamos por todos os sistemas de coordenadas armazenados nas
-        // matrizes the_model, the_view, e the_projection; e escrevemos na tela
-        // as matrizes e pontos resultantes dessas transformações.
-        //glm::vec4 p_model(0.5f, 0.5f, 0.5f, 1.0f);
-        //TextRendering_ShowModelViewProjection(window, projection, view, model, p_model);
 
-        // Imprimimos na tela os ângulos de Euler que controlam a rotação do
-        // terceiro cubo.
+        //Funcionalidades do jogo
+        if((float) glfwGetTime() > 1.0f)
+        {
+            spawnEntity(Matrix_Translate(-28.0f, 0, 28.0f) * Matrix_Scale(1.5f, 1.5f, 1.5f) , COW, "cow");
+            spawnEntity(Matrix_Translate(28.0f, 0, -28.0f) * Matrix_Scale(1.5f, 1.5f, 1.5f), BUNNY, "bunny");
+            spawnEntity(Matrix_Translate(-28.0f, 0, -28.0f)* Matrix_Scale(1.5f, 1.5f, 1.5f), HEAD, "head");
+            spawnEntity(Matrix_Translate(28.0f, 0, 28.0f)* Matrix_Scale(1.5f, 1.5f, 1.5f), BUNNY, "bunny");
+
+        }
+
+        //Fim do loop
         TextRendering_ShowEulerAngles(window);
-
-        // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
         TextRendering_ShowProjection(window);
-
-        // Imprimimos na tela informação sobre o número de quadros renderizados
-        // por segundo (frames per second).
         TextRendering_ShowFramesPerSecond(window);
-
-        // O framebuffer onde OpenGL executa as operações de renderização não
-        // é o mesmo que está sendo mostrado para o usuário, caso contrário
-        // seria possível ver artefatos conhecidos como "screen tearing". A
-        // chamada abaixo faz a troca dos buffers, mostrando para o usuário
-        // tudo que foi renderizado pelas funções acima.
-        // Veja o link: Veja o link: https://en.wikipedia.org/w/index.php?title=Multiple_buffering&oldid=793452829#Double_buffering_in_computer_graphics
         glfwSwapBuffers(window);
-
-        // Verificamos com o sistema operacional se houve alguma interação do
-        // usuário (teclado, mouse, ...). Caso positivo, as funções de callback
-        // definidas anteriormente usando glfwSet*Callback() serão chamadas
-        // pela biblioteca GLFW.
         glfwPollEvents();
     }
 
-    // Finalizamos o uso dos recursos do sistema operacional
     glfwTerminate();
-
-    // Fim do programa
     return 0;
 }
+
+// Função que faz nascer objetos
+void spawnEntity(glm::mat4 model, int objectID, const char* objectName)
+{
+    glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+    glUniform1i(object_id_uniform, objectID);
+    DrawVirtualObject(objectName);
+
+}
+
 
 // Função que carrega uma imagem para ser utilizada como textura
 void LoadTextureImage(const char* filename)
