@@ -96,7 +96,7 @@ GLuint LoadShader_Fragment(const char* filename); // Carrega um fragment shader
 void LoadShader(const char* filename, GLuint shader_id); // Função utilizada pelas duas acima
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Cria um programa de GPU
 void PrintObjModelInfo(ObjModel*); // Função para debugging
-
+void spawnEntity(glm::mat4 model, int modelID, const char* name);
 // Declaração de funções auxiliares para renderizar texto dentro da janela
 // OpenGL. Estas funções estão definidas no arquivo "textrendering.cpp".
 void TextRendering_Init();
@@ -318,6 +318,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&cowmodel);
     BuildTrianglesAndAddToVirtualScene(&cowmodel);
 
+    ObjModel gunmodel("../../data/gun.obj");
+    ComputeNormals(&gunmodel);
+    BuildTrianglesAndAddToVirtualScene(&gunmodel);
+
     if ( argc > 1 )
     {
         ObjModel model(argv[1]);
@@ -346,6 +350,11 @@ int main(int argc, char* argv[])
     float x_inc  = 0.0f;
     float z_inc = 0.0f;
     float y_inc = 0.0f;
+
+    float chase_playerX = 28.0f;
+    float chase_playerZ = 28.0f;
+
+
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -495,74 +504,43 @@ int main(int argc, char* argv[])
 #define HEAD   3
 #define COW    4
 #define PLANE_WALL 5
+#define GUN 6
 
-        // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, SPHERE);
-        DrawVirtualObject("sphere");
 
-        // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
-
-        model = Matrix_Translate(5.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, HEAD);
-        DrawVirtualObject("head");
-
-        model = Matrix_Translate(3.0f,0.0f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, COW);
-        DrawVirtualObject("cow");
-
+        // Desenhamos o plano
 
         // Desenhamos o plano do chão
         model = Matrix_Translate(0.0f,-1.1f,0.0f)
                 * Matrix_Scale(30.0f,30.0f,30.0f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
+        spawnEntity(model, PLANE, "plane");
 
 
         model = Matrix_Translate(0.0f,3.85f,30.0f)
                 * Matrix_Scale(30.0f,5.0f,0.0f)
                 * Matrix_Rotate_X(-1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
+        spawnEntity(model, PLANE_WALL, "plane");
 
         model = Matrix_Translate(0.0f,3.85f,-30.0f)
                 * Matrix_Scale(30.0f,5.0f,0.0f)
                 * Matrix_Rotate_X(1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
+        spawnEntity(model, PLANE_WALL, "plane");
 
         model = Matrix_Translate(30.0f,3.85f,0.0f)
                 * Matrix_Scale(0.0f,5.0f,30.0f)
                 * Matrix_Rotate_Z(1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
+        spawnEntity(model, PLANE_WALL, "plane");
 
         model = Matrix_Translate(-30.0f,3.85f,0.0f)
                 * Matrix_Scale(0.0f,5.0f,30.0f)
                 * Matrix_Rotate_Z(-1.5708f);
-        glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE_WALL);
-        DrawVirtualObject("plane");
+        spawnEntity(model, PLANE_WALL, "plane");
 
         if(!isFirstPerson)
         {
             model = Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
-                    * Matrix_Scale(1.0f,1.0f,1.0f)
+                    * Matrix_Scale(5.0f,5.0f,5.0f)
                     * Matrix_Rotate_Y(g_CameraTheta);
-            glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-            glUniform1i(object_id_uniform, HEAD);
-            DrawVirtualObject("head");
+            spawnEntity(model, GUN, "gun");
         }
 
         if(isFirstPerson)
@@ -612,18 +590,40 @@ int main(int argc, char* argv[])
 
 
 
-            BuildTrianglesAndAddToVirtualScene(&spheremodel);
-            model = Matrix_Translate(position.x + x_inc, position.y + y_inc,  position.z + z_inc) * Matrix_Scale(0.3f,0.3f,0.3f);
-            glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-            glUniform1i(object_id_uniform, HEAD);
 
-            DrawVirtualObject("sphere");
+            model = Matrix_Translate(position.x + x_inc, position.y + y_inc,  position.z + z_inc) * Matrix_Scale(0.3f,0.3f,0.3f);
+            spawnEntity(model, SPHERE, "sphere");
 
             z_inc += zBulletDirection * variation_time * bulletSpeed;
             x_inc += xBulletDirection * variation_time * bulletSpeed;
             y_inc += yBulletDirection * variation_time * bulletSpeed;
         }
         spacePressed = spaceCurrentlyPressed;
+
+
+        //Após 5 seg spawna 4 coelhos nos cantos do plano
+        if((float) glfwGetTime() >= 5.0f)
+        {
+
+
+
+            model = Matrix_Translate(chase_playerX, 0.0f, -chase_playerZ);
+            spawnEntity(model, BUNNY, "bunny");
+            model = Matrix_Translate(-chase_playerX, 0.0f, chase_playerZ);
+            spawnEntity(model, BUNNY, "bunny");
+            model = Matrix_Translate(-chase_playerX, 0.0f, -chase_playerZ);
+            spawnEntity(model, BUNNY, "bunny");
+            model = Matrix_Translate(chase_playerX, 0.0f, chase_playerZ);
+            spawnEntity(model, BUNNY, "bunny");
+
+
+
+
+
+
+        }
+
+        std::cout << pos_MC_x << '\n' << pos_MC_z << std::endl;
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -663,6 +663,16 @@ int main(int argc, char* argv[])
 
     // Fim do programa
     return 0;
+}
+
+
+//Função desenhadora de coelhos, vacas,cabeças ou esferas
+void spawnEntity(glm::mat4 model, int modelID, const char* name)
+{
+
+            glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+            glUniform1i(object_id_uniform, modelID);
+            DrawVirtualObject(name);
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
