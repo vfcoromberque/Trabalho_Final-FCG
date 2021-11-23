@@ -311,6 +311,7 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
     LoadTextureImage("../../data/dirt.jpg");                        // TextureImage2
     LoadTextureImage("../../data/brick.jpg");                        // TextureImage3
+    LoadTextureImage("../../data/metal.jpg");                        // TextureImage4
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -480,7 +481,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -80.0f; // Posição do "far plane"
+        float farplane  = -50.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -537,7 +538,8 @@ int main(int argc, char* argv[])
         {
             spawnEntity(Matrix_Translate(pos_MC_x,pos_MC_y,pos_MC_z)
                         * Matrix_Scale(5.0f,5.0f,5.0f)
-                        * Matrix_Rotate_Y(g_CameraTheta - 1.55f), GUN, "gun");
+                        * Matrix_Rotate_Y(g_CameraTheta - 1.5708f)
+                        * Matrix_Rotate_Z(g_CameraPhi - 0.3), GUN, "gun");
         }
 
         if(isFirstPerson)
@@ -574,15 +576,15 @@ int main(int argc, char* argv[])
         }
         if(bulletShot == true)
         {
-            glm::vec4 curva_aux = glm::vec4(0.0f,-1.0f,0.0f,1.0f);
+            glm::vec4 curva_aux = glm::vec4(0.0f,-0.05f,0.0f,1.0f);
             glm::vec4 w_p2 = w_aux;
             w_p2 += curva_aux;
             glm::vec4 w_p3 = w_aux;
             w_p3 += curva_aux;
             glm::vec4 p1 = glm::vec4(position.x,position.y,position.z,0.0f);
-            glm::vec4 p2 = p1 - w_p2 * glm::vec4(6.0f,1.0f + w.y,6.0f,0.0f);
-            glm::vec4 p3 = p1 - w_p3 * glm::vec4(12.0f,1.0f + w.y,12.0f,0.0f);
-            glm::vec4 p4 = p1 - w_aux * glm::vec4(18.0f,0.5f + w.y,18.0f,0.0f);
+            glm::vec4 p2 = p1 - w_p2 * glm::vec4(6.0f,6.0f,6.0f,0.0f);
+            glm::vec4 p3 = p1 - w_p3 * glm::vec4(12.0f,12.0f,12.0f,0.0f);
+            glm::vec4 p4 = p1 - w_aux * glm::vec4(18.0f,18.0f,18.0f,0.0f);
             glm::vec4 c12 = p1 + t*(p2-p1);
             glm::vec4 c23 = p2 + t*(p3-p2);
             glm::vec4 c34 = p3 + t*(p4-p3);

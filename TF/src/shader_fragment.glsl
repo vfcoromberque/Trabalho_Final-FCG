@@ -93,9 +93,9 @@ void main()
         // PREENCHA AQUI
         // Propriedades espectrais da esfera
         Kd = vec3(1.0,1.0,1.0);
-        Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
-        q = 1.0;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.2,0.2,0.2);
+        q = 32.0;
 
         // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
         // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
@@ -189,7 +189,7 @@ void main()
 
     }
     else if (object_id == HEAD){
-        Kd = vec3(0.1,3.0,0.1);
+        Kd = vec3(1.0,0.1,0.1);
         Ks = vec3(0.8,0.8,0.8);
         Ka = vec3(0.04,0.2,0.4);
         q = 32.0;
@@ -203,9 +203,9 @@ void main()
 
     }
     else if (object_id == GUN){
-        Kd = vec3(0.0, 0.0, 0.0);
+        Kd = vec3(0.5, 0.5, 0.5);
         Ks = vec3(0.8, 0.8, 0.8);
-        Ka = vec3(0.04, 0.2, 0.4);
+        Ka = vec3(0.2, 0.2, 0.2);
         q = 32.0;
     }
     else // Objeto desconhecido = preto
@@ -240,6 +240,8 @@ void main()
 
     vec3 Kd3 = texture(TextureImage3, vec2(U,V)).rgb;
 
+    vec3 Kd4 = texture(TextureImage4, vec2(U,V)).rgb;
+
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
@@ -251,25 +253,25 @@ void main()
 
         color = Kd3 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
 
+    }else if(object_id == SPHERE){
+
+        color = Kd4 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
+
     }else{
 
-        color = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
+        color = (lambert_diffuse_term + ambient_term + blinn_phong_specular_term + 0.01);
 
     }
+
+
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
-    if(object_id == SPHERE){
+    if(object_id == HEAD){
 
         color = colorGouraud;
     }
-    if(object_id == GUN){
-        color = pow(color, vec3(0.35, 0.35, 0.35)/2.2);
-    }
-   if(object_id == HEAD){
-        color = pow(color, vec3(0.0,1,4.2)/2.2);
-    }
-    else
+
 
     color = pow(color, vec3(1.0,1.0,1.0)/2.2);
 }
