@@ -168,7 +168,7 @@ void main()
         // Propriedades espectrais do plano
         Kd = vec3(0.1,0.1,0.1);
         Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
+        Ka = vec3(0.2,0.2,0.2);
         q = 1.0;
 
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
@@ -177,9 +177,9 @@ void main()
     }
     else if (object_id == PLANE_WALL){
 
-        Kd = vec3(0.1,0.1,0.1);
+        Kd = vec3(1.0,1.0,1.0);
         Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
+        Ka = vec3(0.2,0.2,0.2);
         q = 1.0;
 
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
