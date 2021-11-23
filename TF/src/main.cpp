@@ -51,6 +51,8 @@
 // Headers locais, definidos na pasta "include/"
 #include "utils.h"
 #include "matrices.h"
+#include "collision.h"
+
 
 #define SPHERE 0
 #define BUNNY  1
@@ -481,7 +483,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -50.0f; // Posição do "far plane"
+        float farplane  = -70.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -637,6 +639,8 @@ int main(int argc, char* argv[])
             spawnEntity(Matrix_Translate(28.0f, 0, 28.0f)* Matrix_Scale(1.5f, 1.5f, 1.5f), BUNNY, "bunny");
 
         }
+
+        collisionHandler();
 
         //Fim do loop
         TextRendering_ShowEulerAngles(window);
