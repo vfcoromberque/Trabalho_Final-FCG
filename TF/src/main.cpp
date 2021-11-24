@@ -235,6 +235,11 @@ float sensivity = 3.0f;
 
 float t = 0;
 
+
+int object_id;
+
+
+
 int main(int argc, char* argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -640,7 +645,7 @@ int main(int argc, char* argv[])
 
         }
 
-        collisionHandler();
+        //collisionHandler(g_VirtualScene[SceneObject.name].bbox_min, g_VirtualScene[SceneObject.name].bbox_max, SceneObject.name);
 
         //Fim do loop
         TextRendering_ShowEulerAngles(window);
