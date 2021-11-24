@@ -73,10 +73,10 @@ void main()
 
     vec4 h = normalize(v + l);
 
-    vec3 Kd = vec3(1.0,0.1,0.1);
-    vec3 Ks = vec3(0.8,0.8,0.8);
+    vec3 Kd = vec3(1.0,1.0,1.0);
+    vec3 Ks = vec3(0.0,0.0,0.0);
     vec3 Ka = vec3(0.0,0.0,0.0);
-    float q = 32.0;
+    float q = 1.0;
 
     vec3 I = vec3(1.0,1.0,1.0);
     float lambert = max(0,dot(n,l));

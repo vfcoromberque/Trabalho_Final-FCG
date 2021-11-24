@@ -62,6 +62,7 @@
 #define PLANE_WALL 5
 #define GUN 6
 #define DEER 7
+#define SPHERE_DEMO 8
 
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
@@ -540,6 +541,11 @@ int main(int argc, char* argv[])
                     * Matrix_Scale(0.0f,5.0f,30.0f)
                     * Matrix_Rotate_Z(-1.5708f), PLANE_WALL, "plane");
 
+        spawnEntity(Matrix_Translate(0.0f,1.0f,-14.0f)
+                    * Matrix_Scale(2.0f,2.0f,2.0f), SPHERE_DEMO, "sphere");
+
+
+
         //Desenha o personagem principal
         if(!isFirstPerson)
         {
@@ -638,10 +644,18 @@ int main(int argc, char* argv[])
         //Funcionalidades do jogo
         if((float) glfwGetTime() > 1.0f)
         {
-            spawnEntity(Matrix_Translate(-28.0f, 0, 28.0f) * Matrix_Scale(1.5f, 1.5f, 1.5f) , COW, "cow");
-            spawnEntity(Matrix_Translate(28.0f, 0, -28.0f) * Matrix_Scale(1.5f, 1.5f, 1.5f), BUNNY, "bunny");
-            spawnEntity(Matrix_Translate(-28.0f, 0, -28.0f)* Matrix_Scale(1.5f, 1.5f, 1.5f), HEAD, "head");
-            spawnEntity(Matrix_Translate(28.0f, 0, 28.0f)* Matrix_Scale(1.5f, 1.5f, 1.5f), BUNNY, "bunny");
+            spawnEntity(Matrix_Translate(-26.0f, 0.5f, 26.0f)
+                        * Matrix_Scale(2.5f, 2.5f, 2.5f)
+                        * Matrix_Rotate_Y(0.785398f) , COW, "cow");
+            spawnEntity(Matrix_Translate(28.0f, -0.1f, -28.0f)
+                        * Matrix_Scale(1.0f, 1.0f, 1.0f)
+                        * Matrix_Rotate_Y(0.785398f), BUNNY, "bunny");
+            spawnEntity(Matrix_Translate(-28.0f, 0.3f, -28.0f)
+                        * Matrix_Scale(1.5f, 1.5f, 1.5f)
+                        * Matrix_Rotate_Y(-2.35619f), HEAD, "head");
+            spawnEntity(Matrix_Translate(28.0f, -0.1f, 28.0f)
+                        * Matrix_Scale(1.0f, 1.0f, 1.0f)
+                        * Matrix_Rotate_Y(-0.785398f), BUNNY, "bunny");
 
         }
 
